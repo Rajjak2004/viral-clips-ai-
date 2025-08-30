@@ -556,6 +556,4 @@ const ViralClipsAI = () => {
                   <p className={`text-lg mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
                     {dragOver ? 'Drop your video here' : 'Click to upload or drag and drop'}
                   </p>
-                  <p className={`${darkMode ? 'text-purple-200' : 'text-gray-800'}`}>
-  Supported formats: MP4, MOV, AVI, etc.
-</p>
+                  <p className={`${darkMode ? 'text-purple-200
