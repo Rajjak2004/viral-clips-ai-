@@ -556,4 +556,595 @@ const ViralClipsAI = () => {
                   <p className={`text-lg mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
                     {dragOver ? 'Drop your video here' : 'Click to upload or drag and drop'}
                   </p>
-                  <p className={`${darkMode ? 'text-purple-200
+                  <p className={`${darkMode ? 'text-purple-200' : 'text-purple-600'}`}>
+                    Supports MP4, MOV, AVI, WebM (max 2GB)
+                  </p>
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0])}
+                  className="hidden"
+                  disabled={processing}
+                />
+
+                {videoMetadata && (
+                  <div className={`mt-6 p-4 rounded-lg ${
+                    darkMode ? 'bg-green-500/20 text-green-300' : 'bg-green-100 text-green-700'
+                  }`}>
+                    <div className="flex items-center space-x-3">
+                      {videoMetadata.thumbnail ? (
+                        <img 
+                          src={videoMetadata.thumbnail} 
+                          alt="Video thumbnail"
+                          className="w-16 h-16 object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 bg-purple-500 rounded-lg flex items-center justify-center">
+                          <Video className="w-8 h-8 text-white" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-medium">{videoMetadata.name}</p>
+                        <p className="text-sm opacity-75">
+                          {videoMetadata.duration} • {videoMetadata.size}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {uploadedVideo && !processing && (
+                  <button
+                    onClick={() => processVideo(uploadedVideo)}
+                    className="w-full mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all flex items-center justify-center space-x-2"
+                    disabled={!apiKeyValid}
+                  >
+                    <Zap className="w-5 h-5" />
+                    <span>Generate Viral Clips</span>
+                  </button>
+                )}
+              </div>
+
+              {/* URL Input */}
+              <div className={`backdrop-blur-lg rounded-2xl p-8 border transition-all ${
+                darkMode 
+                  ? 'bg-white/10 border-white/20' 
+                  : 'bg-white/50 border-gray-200'
+              }`}>
+                <h3 className={`text-2xl font-semibold mb-6 flex items-center ${
+                  darkMode ? 'text-white' : 'text-gray-800'
+                }`}>
+                  <Camera className="mr-3" />
+                  From URL
+                </h3>
+                
+                <div className="space-y-4">
+                  <input
+                    type="url"
+                    placeholder="Paste YouTube, TikTok, or video URL..."
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    className={`w-full p-4 rounded-xl border transition-all ${
+                      darkMode 
+                        ? 'bg-white/10 border-white/20 text-white placeholder-purple-200' 
+                        : 'bg-white border-gray-300 text-gray-800 placeholder-gray-500'
+                    } focus:border-purple-500 focus:outline-none`}
+                    disabled={processing}
+                  />
+                  
+                  <button
+                    onClick={handleUrlSubmit}
+                    disabled={!videoUrl || processing || !apiKeyValid}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Download className="w-5 h-5" />
+                    <span>Process from URL</span>
+                  </button>
+                </div>
+
+                <div className={`mt-6 text-sm ${darkMode ? 'text-purple-200' : 'text-purple-600'}`}>
+                  <p className="font-medium mb-2">Supported platforms:</p>
+                  <ul className="space-y-1 text-sm opacity-75">
+                    <li>• YouTube (videos, shorts, live streams)</li>
+                    <li>• TikTok (public videos)</li>
+                    <li>• Instagram (reels, IGTV)</li>
+                    <li>• Direct video URLs (.mp4, .mov, etc.)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Processing Status */}
+            {processing && (
+              <div className={`backdrop-blur-lg rounded-2xl p-8 border ${
+                darkMode ? 'bg-white/10 border-white/20' : 'bg-white/50 border-gray-200'
+              }`}>
+                <div className="text-center space-y-6">
+                  <div className="relative">
+                    <div className="w-24 h-24 mx-auto mb-6">
+                      <div className="relative w-24 h-24">
+                        <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                          <circle
+                            cx="50" cy="50" r="40"
+                            stroke={darkMode ? "#ffffff20" : "#e5e7eb"}
+                            strokeWidth="8" fill="none"
+                          />
+                          <circle
+                            cx="50" cy="50" r="40"
+                            stroke="#8b5cf6"
+                            strokeWidth="8" fill="none"
+                            strokeLinecap="round"
+                            strokeDasharray={`${2 * Math.PI * 40}`}
+                            strokeDashoffset={`${2 * Math.PI * 40 * (1 - processingProgress / 100)}`}
+                            className="transition-all duration-500"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                            {processingProgress}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className={`text-2xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                      Processing Your Video
+                    </h3>
+                    <p className={`text-lg ${darkMode ? 'text-purple-200' : 'text-purple-600'}`}>
+                      {processingStatus}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-center space-x-4">
+                    <div className="flex space-x-1">
+                      {[0, 1, 2].map((i) => (
+                        <div
+                          key={i}
+                          className={`w-2 h-2 rounded-full bg-purple-500 animate-pulse`}
+                          style={{ animationDelay: `${i * 0.2}s` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={cancelProcessing}
+                    className={`px-6 py-3 rounded-lg border transition-all ${
+                      darkMode 
+                        ? 'border-red-500/30 text-red-400 hover:bg-red-500/20' 
+                        : 'border-red-300 text-red-600 hover:bg-red-50'
+                    }`}
+                  >
+                    Cancel Processing
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Settings Tab */}
+        {currentTab === 'settings' && (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                API Configuration
+              </h2>
+              <p className={`text-xl mb-8 ${darkMode ? 'text-purple-200' : 'text-purple-600'}`}>
+                Connect your Klap API to start generating viral clips
+              </p>
+            </div>
+
+            <div className={`max-w-2xl mx-auto backdrop-blur-lg rounded-2xl p-8 border ${
+              darkMode ? 'bg-white/10 border-white/20' : 'bg-white/50 border-gray-200'
+            }`}>
+              <div className="space-y-6">
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${
+                    darkMode ? 'text-white' : 'text-gray-700'
+                  }`}>
+                    Klap API Key
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      placeholder="Enter your Klap API key..."
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      className={`w-full p-4 pr-12 rounded-xl border transition-all ${
+                        darkMode 
+                          ? 'bg-white/10 border-white/20 text-white placeholder-purple-200' 
+                          : 'bg-white border-gray-300 text-gray-800 placeholder-gray-500'
+                      } focus:border-purple-500 focus:outline-none`}
+                    />
+                    {apiKeyValid && (
+                      <CheckCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-400" />
+                    )}
+                  </div>
+                  <p className={`text-sm mt-2 ${darkMode ? 'text-purple-200' : 'text-purple-600'}`}>
+                    Get your API key from{' '}
+                    <a 
+                      href="https://klap.app/api" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="underline hover:text-purple-400"
+                    >
+                      klap.app/api
+                    </a>
+                  </p>
+                </div>
+
+                <button
+                  onClick={saveApiKey}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all"
+                >
+                  Save API Key
+                </button>
+
+                {/* Account Status */}
+                {apiKeyValid && accountInfo && (
+                  <div className={`p-6 rounded-xl border ${
+                    darkMode 
+                      ? 'bg-green-500/20 border-green-500/30' 
+                      : 'bg-green-100 border-green-300'
+                  }`}>
+                    <div className="flex items-center space-x-3 mb-4">
+                      <CheckCircle className="w-6 h-6 text-green-400" />
+                      <h3 className={`text-lg font-semibold ${
+                        darkMode ? 'text-green-300' : 'text-green-700'
+                      }`}>
+                        API Connected Successfully
+                      </h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className={`${darkMode ? 'text-green-200' : 'text-green-600'} opacity-75`}>
+                          Account Type
+                        </p>
+                        <p className={`font-medium ${darkMode ? 'text-green-300' : 'text-green-700'}`}>
+                          {accountInfo.subscription || 'Free'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className={`${darkMode ? 'text-green-200' : 'text-green-600'} opacity-75`}>
+                          Credits Remaining
+                        </p>
+                        <p className={`font-medium ${darkMode ? 'text-green-300' : 'text-green-700'}`}>
+                          {accountInfo.credits || 'Unlimited'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* API Info */}
+                <div className={`p-6 rounded-xl border ${
+                  darkMode 
+                    ? 'bg-blue-500/20 border-blue-500/30' 
+                    : 'bg-blue-100 border-blue-300'
+                }`}>
+                  <h3 className={`text-lg font-semibold mb-3 ${
+                    darkMode ? 'text-blue-300' : 'text-blue-700'
+                  }`}>
+                    About Klap API
+                  </h3>
+                  <ul className={`space-y-2 text-sm ${
+                    darkMode ? 'text-blue-200' : 'text-blue-600'
+                  }`}>
+                    <li>• Generate viral short clips from long videos</li>
+                    <li>• AI-powered content analysis and editing</li>
+                    <li>• Automatic captions and reframing</li>
+                    <li>• Support for multiple platforms (YouTube, TikTok, Instagram)</li>
+                    <li>• Professional quality output</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Results Tab */}
+        {currentTab === 'results' && (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                Generated Viral Clips
+              </h2>
+              <p className={`text-xl mb-8 ${darkMode ? 'text-purple-200' : 'text-purple-600'}`}>
+                {generatedClips.length > 0 
+                  ? `${generatedClips.length} clips ready to go viral!`
+                  : 'No clips generated yet. Upload a video to get started.'
+                }
+              </p>
+            </div>
+
+            {generatedClips.length > 0 ? (
+              <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {generatedClips.map((clip) => (
+                  <div
+                    key={clip.id}
+                    className={`backdrop-blur-lg rounded-2xl p-6 border transition-all hover:scale-105 ${
+                      darkMode 
+                        ? 'bg-white/10 border-white/20 hover:bg-white/15' 
+                        : 'bg-white/50 border-gray-200 hover:bg-white/70'
+                    }`}
+                  >
+                    {/* Thumbnail */}
+                    <div className="relative mb-4 rounded-xl overflow-hidden bg-gray-900">
+                      {clip.thumbnail ? (
+                        <img 
+                          src={clip.thumbnail} 
+                          alt={clip.title}
+                          className="w-full h-48 object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-48 bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                          <Video className="w-12 h-12 text-white" />
+                        </div>
+                      )}
+                      
+                      {/* Play button overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <button
+                          onClick={() => setSelectedClip(clip)}
+                          className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-all"
+                        >
+                          <Play className="w-8 h-8 text-white ml-1" />
+                        </button>
+                      </div>
+
+                      {/* Viral Score Badge */}
+                      <div className="absolute top-3 right-3">
+                        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-3 py-1 rounded-full flex items-center space-x-1">
+                          <Star className="w-4 h-4" />
+                          <span className="font-bold text-sm">{clip.score}</span>
+                        </div>
+                      </div>
+
+                      {/* Duration */}
+                      <div className="absolute bottom-3 left-3">
+                        <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded text-sm">
+                          {formatDuration(clip.duration)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Clip Info */}
+                    <div className="space-y-3">
+                      <h3 className={`font-semibold text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                        {clip.title}
+                      </h3>
+                      
+                      {clip.transcript && (
+                        <p className={`text-sm line-clamp-3 ${
+                          darkMode ? 'text-purple-200' : 'text-purple-600'
+                        }`}>
+                          {clip.transcript.substring(0, 120)}...
+                        </p>
+                      )}
+
+                      {/* Tags */}
+                      {clip.tags && clip.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {clip.tags.slice(0, 3).map((tag, index) => (
+                            <span
+                              key={index}
+                              className={`px-2 py-1 rounded-full text-xs ${
+                                darkMode 
+                                  ? 'bg-purple-500/20 text-purple-300' 
+                                  : 'bg-purple-100 text-purple-600'
+                              }`}
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Action buttons */}
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => setSelectedClip(clip)}
+                          className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-all flex items-center justify-center space-x-2"
+                        >
+                          <Play className="w-4 h-4" />
+                          <span>Preview</span>
+                        </button>
+                        
+                        <button
+                          onClick={() => downloadClip(clip)}
+                          className={`p-2 rounded-lg border transition-all ${
+                            darkMode 
+                              ? 'border-white/20 text-white hover:bg-white/10' 
+                              : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                          }`}
+                        >
+                          <Download className="w-5 h-5" />
+                        </button>
+                        
+                        <button
+                          className={`p-2 rounded-lg border transition-all ${
+                            darkMode 
+                              ? 'border-white/20 text-white hover:bg-white/10' 
+                              : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                          }`}
+                        >
+                          <Share2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <Scissors className={`w-24 h-24 mx-auto mb-6 ${
+                  darkMode ? 'text-purple-400' : 'text-purple-500'
+                } opacity-50`} />
+                <h3 className={`text-2xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                  No Clips Generated Yet
+                </h3>
+                <p className={`text-lg mb-8 ${darkMode ? 'text-purple-200' : 'text-purple-600'}`}>
+                  Upload a video to start generating viral clips with AI
+                </p>
+                <button
+                  onClick={() => setCurrentTab('upload')}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-8 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all"
+                >
+                  Upload Video
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* History Tab */}
+        {currentTab === 'history' && (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                Processing History
+              </h2>
+              <p className={`text-xl mb-8 ${darkMode ? 'text-purple-200' : 'text-purple-600'}`}>
+                View your previously processed videos and clips
+              </p>
+            </div>
+
+            {jobHistory.length > 0 ? (
+              <div className="space-y-4">
+                {jobHistory.map((job, index) => (
+                  <div
+                    key={job.id || index}
+                    className={`backdrop-blur-lg rounded-xl p-6 border ${
+                      darkMode ? 'bg-white/10 border-white/20' : 'bg-white/50 border-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                          <Video className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                            {job.title || `Job ${job.id}`}
+                          </h3>
+                          <p className={`text-sm ${darkMode ? 'text-purple-200' : 'text-purple-600'}`}>
+                            {new Date(job.created_at).toLocaleDateString()} • 
+                            {job.clips_count || 0} clips generated
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <div className={`px-3 py-1 rounded-full text-sm ${
+                          job.status === 'completed' 
+                            ? 'bg-green-500/20 text-green-400'
+                            : job.status === 'processing'
+                            ? 'bg-yellow-500/20 text-yellow-400'
+                            : 'bg-red-500/20 text-red-400'
+                        }`}>
+                          {job.status}
+                        </div>
+                        
+                        <button className={`p-2 rounded-lg border transition-all ${
+                          darkMode 
+                            ? 'border-white/20 text-white hover:bg-white/10' 
+                            : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                        }`}>
+                          <TrendingUp className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <Clock className={`w-24 h-24 mx-auto mb-6 ${
+                  darkMode ? 'text-purple-400' : 'text-purple-500'
+                } opacity-50`} />
+                <h3 className={`text-2xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                  No Processing History
+                </h3>
+                <p className={`text-lg ${darkMode ? 'text-purple-200' : 'text-purple-600'}`}>
+                  Your video processing history will appear here
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Video Preview Modal */}
+      {selectedClip && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className={`max-w-2xl w-full backdrop-blur-lg rounded-2xl p-6 ${
+            darkMode ? 'bg-white/10' : 'bg-white/90'
+          }`}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                {selectedClip.title}
+              </h3>
+              <button
+                onClick={() => setSelectedClip(null)}
+                className={`p-2 rounded-lg transition-all ${
+                  darkMode ? 'hover:bg-white/10 text-white' : 'hover:bg-gray-100 text-gray-600'
+                }`}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="rounded-xl overflow-hidden bg-black">
+              {selectedClip.url ? (
+                <video
+                  src={selectedClip.url}
+                  controls
+                  className="w-full h-auto max-h-96"
+                  autoPlay
+                >
+                  Your browser does not support video playback.
+                </video>
+              ) : (
+                <div className="w-full h-96 flex items-center justify-center">
+                  <div className="text-center">
+                    <Video className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-400">Video preview not available</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 flex space-x-3">
+              <button
+                onClick={() => downloadClip(selectedClip)}
+                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-6 rounded-xl font-medium hover:from-purple-700 hover:to-pink-700 transition-all flex items-center justify-center space-x-2"
+              >
+                <Download className="w-5 h-5" />
+                <span>Download</span>
+              </button>
+              
+              <button
+                className={`px-6 py-3 rounded-xl border transition-all ${
+                  darkMode 
+                    ? 'border-white/20 text-white hover:bg-white/10' 
+                    : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <Share2 className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ViralClipsAI;
