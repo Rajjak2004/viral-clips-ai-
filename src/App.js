@@ -5,7 +5,6 @@ import {
   Clock, AlertCircle, CheckCircle, X, Menu, Sun, Moon, User
 } from 'lucide-react';
 
-// Simple mock API service
 const mockApi = {
   apiKey: '',
   setApiKey: function(key) {
@@ -66,7 +65,6 @@ const mockApi = {
   }
 };
 
-// Utility functions
 const formatDuration = (seconds) => {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
@@ -83,7 +81,7 @@ const formatFileSize = (bytes) => {
 
 const validateVideoFile = (file) => {
   const validTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/mkv', 'video/webm'];
-  const maxSize = 2 * 1024 * 1024 * 1024; // 2GB
+  const maxSize = 2 * 1024 * 1024 * 1024;
 
   if (!validTypes.includes(file.type)) {
     return {
@@ -313,7 +311,6 @@ const ViralClipsAI = () => {
         }
       `}</style>
 
-      {/* Notification */}
       {notification && (
         <div className="fixed top-4 right-4 z-50">
           <div className={`p-4 rounded-lg shadow-lg flex items-center space-x-2 ${
@@ -330,7 +327,6 @@ const ViralClipsAI = () => {
         </div>
       )}
 
-      {/* Header */}
       <header className={`backdrop-blur-lg border-b transition-colors ${
         darkMode ? 'bg-black/20 border-white/10' : 'bg-white/20 border-gray-200/50'
       }`}>
@@ -397,7 +393,6 @@ const ViralClipsAI = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Navigation Tabs */}
         <div className={`flex space-x-1 p-1 rounded-xl mb-8 backdrop-blur-lg ${
           darkMode ? 'bg-black/20' : 'bg-white/20'
         }`}>
@@ -425,7 +420,6 @@ const ViralClipsAI = () => {
           ))}
         </div>
 
-        {/* Upload Tab */}
         {currentTab === 'upload' && (
           <div className="space-y-8">
             {!apiKeyValid && (
@@ -602,7 +596,6 @@ const ViralClipsAI = () => {
           </div>
         )}
 
-        {/* Settings Tab */}
         {currentTab === 'settings' && (
           <div className="max-w-2xl mx-auto">
             <div className={`backdrop-blur-lg rounded-2xl p-8 border ${
@@ -678,7 +671,6 @@ const ViralClipsAI = () => {
           </div>
         )}
 
-        {/* Results Tab */}
         {currentTab === 'results' && (
           <div>
             <div className="text-center mb-8">
@@ -729,51 +721,15 @@ const ViralClipsAI = () => {
                     
                     <div className="p-4">
                       <h3 className={`font-semibold mb-2 ${
-                        darkMode ?
-</div>
-            )}
-
-            {uploadedVideo && (
-              <div className="text-center">
-                <button
-                  onClick={() => processVideo(uploadedVideo)}
-                  disabled={processing || !apiKeyValid}
-                  className="btn-primary px-12 py-4 text-lg disabled:opacity-50"
-                >
-                  {processing ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>Processing Video... {Math.round(processingProgress)}%</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center space-x-2">
-                      <Zap className="w-6 h-6" />
-                      <span>Generate Viral Clips</span>
-                    </div>
-                  )}
-                </button>
-                
-                {processing && (
-                  <div className="mt-4">
-                    <div className={`w-full rounded-full h-2 ${
-                      darkMode ? 'bg-gray-700' : 'bg-gray-200'
-                    }`}>
-                      <div 
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500"
-                        style={{ width: processingProgress + '%' }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Settings and Results tabs... */}
-      </div>
-    </div>
-  );
-};
-
-export default ViralClipsAI;
+                        darkMode ? 'text-white' : 'text-gray-800'
+                      }`}>
+                        {clip.title}
+                      </h3>
+                      
+                      {clip.transcript && (
+                        <p className={`text-sm mb-3 ${
+                          darkMode ? 'text-purple-200' : 'text-gray-600'
+                        }`}>
+                          {clip.transcript.substring(0, 100)}...
+                        </p>
+                      )}
