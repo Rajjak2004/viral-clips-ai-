@@ -730,3 +730,50 @@ const ViralClipsAI = () => {
                     <div className="p-4">
                       <h3 className={`font-semibold mb-2 ${
                         darkMode ?
+</div>
+            )}
+
+            {uploadedVideo && (
+              <div className="text-center">
+                <button
+                  onClick={() => processVideo(uploadedVideo)}
+                  disabled={processing || !apiKeyValid}
+                  className="btn-primary px-12 py-4 text-lg disabled:opacity-50"
+                >
+                  {processing ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Processing Video... {Math.round(processingProgress)}%</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <Zap className="w-6 h-6" />
+                      <span>Generate Viral Clips</span>
+                    </div>
+                  )}
+                </button>
+                
+                {processing && (
+                  <div className="mt-4">
+                    <div className={`w-full rounded-full h-2 ${
+                      darkMode ? 'bg-gray-700' : 'bg-gray-200'
+                    }`}>
+                      <div 
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500"
+                        style={{ width: processingProgress + '%' }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Settings and Results tabs... */}
+      </div>
+    </div>
+  );
+};
+
+export default ViralClipsAI;
