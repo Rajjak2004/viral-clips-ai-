@@ -111,7 +111,7 @@ const ViralClipsAI = () => {
     setVideoMetadata({ name: file.name, size: formatFileSize(file.size), duration: 'Processing...' });
   }; 
   return (
-    <div className={\`min-h-screen \${darkMode ? 'bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'}\`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'}`}>
       {notification && (
         <div className="fixed top-4 right-4 p-3 rounded-lg shadow-lg text-white z-50" style={{ background: notification.type === 'success' ? 'green' : notification.type === 'error' ? 'red' : 'blue' }}>
           <span>{notification.message}</span>
