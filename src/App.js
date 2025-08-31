@@ -723,7 +723,3 @@ const ViralClipsAI = () => {
                           darkMode ? 'text-purple-200' : 'text-gray-600'
                         }`}>
                           {clip.transcript.substring(0, 100)}...
-                        </p>
-                      )}
-
-                      {clip.tags && clip.tags.length > 0 && (
