@@ -595,8 +595,18 @@ const ViralClipsAI = () => {
               {/* File Upload */}
               <div className={`backdrop-blur-lg rounded-2xl p-8 border transition-all ${
                 darkMode 
-              // ...all your component code above...
+              // ...existing code...
 
+            {/* File Upload */}
+            <div className={`backdrop-blur-lg rounded-2xl p-8 border transition-all ${
+                darkMode 
+                // ...rest of your styling logic
+            }`}>
+                {/* Upload logic/components here */}
+            </div>
+        </div>
+    </div>
+  );
 };
 
 export default ViralClipsAI;
