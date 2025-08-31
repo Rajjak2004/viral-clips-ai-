@@ -706,6 +706,35 @@ const ViralClipsAI = () => {
                           className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-all"
                           onClick={() => setSelectedClip(clip)}
                         <div className="aspect-w-9 aspect-h-16 bg-gray-800 relative">
+  <img
+    src={clip.thumbnail}
+    alt={clip.title}
+    className="w-full h-full object-cover"
+  />
+
+  {/* Play Button */}
+  <div className="absolute inset-0 flex items-center justify-center">
+    <button
+      className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-all"
+      onClick={() => setSelectedClip(clip)}
+    >
+      <Play className="w-8 h-8 text-white ml-1" />
+    </button>
+  </div>
+
+  {/* Score Badge */}
+  <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center">
+    <Star className="w-4 h-4 mr-1" />
+    {clip.score}%
+  </div>
+
+  {/* Duration */}
+  <div className="absolute bottom-4 left-4 bg-black/50 text-white px-2 py-1 rounded text-sm">
+    <Clock className="w-3 h-3 inline mr-1" />
+    {formatDuration(clip.duration)}
+  </div>
+</div>
+
 
   <img
     src={clip.thumbnail}
