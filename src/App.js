@@ -705,7 +705,8 @@ const ViralClipsAI = () => {
                         <button 
                           className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-all"
                           onClick={() => setSelectedClip(clip)}
-                        <div className="aspect-[9/16] bg-gray-800 relative">
+                        <div className="aspect-w-9 aspect-h-16 bg-gray-800 relative">
+
   <img
     src={clip.thumbnail}
     alt={clip.title}
