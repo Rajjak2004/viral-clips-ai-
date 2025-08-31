@@ -720,16 +720,18 @@ const ViralClipsAI = () => {
                     </div>
                     
                     <div className="p-4">
-                      <h3 className={`font-semibold mb-2 ${
-                        darkMode ? 'text-white' : 'text-gray-800'
-                      }`}>
-                        {clip.title}
-                      </h3>
-                      
-                      {clip.transcript && (
-                        <p className={`text-sm mb-3 ${
-                          darkMode ? 'text-purple-200' : 'text-gray-600'
-                        }`}>
-                          {clip.transcript.substring(0, 100)}...
-                        </p>
-                      )}
+  <h3 className={`font-semibold mb-2 ${
+    darkMode ? 'text-white' : 'text-gray-800'
+  }`}>
+    {clip.title}
+  </h3>
+  
+  {clip.transcript && (
+    <p className={`text-sm mb-3 ${
+      darkMode ? 'text-purple-200' : 'text-gray-600'
+    }`}>
+      {clip.transcript.substring(0, 100)}...
+    </p>
+  )}
+</div>
+
