@@ -5,8 +5,8 @@ import {
   Clock, AlertCircle, CheckCircle, X, Menu, Sun, Moon, User
 } from 'lucide-react';
 
-// Simple API service for demo
-const klapApi = {
+// Simple mock API service
+const mockApi = {
   apiKey: '',
   setApiKey: function(key) {
     this.apiKey = key;
@@ -16,40 +16,39 @@ const klapApi = {
     return localStorage.getItem('klap_api_key') || '';
   },
   generateShorts: async function(videoData, options = {}) {
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 3000));
     
     return {
       clips: [
         {
           id: 1,
-          title: "Viral Moment #1",
+          title: "Most Viral Moment",
           duration: 15,
           score: 95,
           url: "https://example.com/clip1.mp4",
-          thumbnail: "https://via.placeholder.com/400x600/8b5cf6/ffffff?text=Viral+Clip+1",
-          transcript: "This is the most engaging part of your video...",
+          thumbnail: "https://via.placeholder.com/400x600/8b5cf6/ffffff?text=Clip+1",
+          transcript: "This is the most engaging part of your video with great content...",
           tags: ["viral", "trending", "engaging"]
         },
         {
           id: 2,
-          title: "Trending Hook",
+          title: "Perfect Hook", 
           duration: 12,
           score: 88,
-          url: "https://example.com/clip2.mp4", 
-          thumbnail: "https://via.placeholder.com/400x600/ec4899/ffffff?text=Viral+Clip+2",
-          transcript: "Another highly engaging segment...",
+          url: "https://example.com/clip2.mp4",
+          thumbnail: "https://via.placeholder.com/400x600/ec4899/ffffff?text=Clip+2",
+          transcript: "An amazing hook that captures attention immediately...",
           tags: ["hook", "attention", "trending"]
         },
         {
           id: 3,
-          title: "Perfect Ending",
+          title: "Powerful Ending",
           duration: 18,
           score: 82,
-          url: "https://example.com/clip3.mp4",
-          thumbnail: "https://via.placeholder.com/400x600/f59e0b/ffffff?text=Viral+Clip+3", 
+          url: "https://example.com/clip3.mp4", 
+          thumbnail: "https://via.placeholder.com/400x600/f59e0b/ffffff?text=Clip+3",
           transcript: "A compelling conclusion that keeps viewers engaged...",
-          tags: ["ending", "memorable", "conclusion"]
+          tags: ["ending", "memorable", "powerful"]
         }
       ]
     };
@@ -57,13 +56,12 @@ const klapApi = {
   validateApiKey: async function() {
     if (!this.apiKey) return { valid: false, error: 'No API key provided' };
     
-    // Simulate validation
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     return {
-      valid: this.apiKey.startsWith('klap_'),
-      user: { email: 'user@example.com' },
-      credits: 5
+      valid: this.apiKey.length > 5,
+      user: { email: 'demo@example.com' },
+      credits: 10
     };
   }
 };
@@ -72,7 +70,7 @@ const klapApi = {
 const formatDuration = (seconds) => {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+  return mins + ':' + secs.toString().padStart(2, '0');
 };
 
 const formatFileSize = (bytes) => {
@@ -105,7 +103,6 @@ const validateVideoFile = (file) => {
 };
 
 const ViralClipsAI = () => {
-  // State management
   const [currentTab, setCurrentTab] = useState('upload');
   const [uploadedVideo, setUploadedVideo] = useState(null);
   const [videoUrl, setVideoUrl] = useState('');
@@ -124,9 +121,8 @@ const ViralClipsAI = () => {
   
   const fileInputRef = useRef(null);
 
-  // Initialize on component mount
   useEffect(() => {
-    const savedApiKey = klapApi.getApiKey();
+    const savedApiKey = mockApi.getApiKey();
     const savedDarkMode = localStorage.getItem('dark_mode') !== 'false';
     
     setApiKey(savedApiKey);
@@ -137,13 +133,11 @@ const ViralClipsAI = () => {
     }
   }, []);
 
-  // Show notification
   const showNotification = (message, type = 'info') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
   };
 
-  // Validate API key
   const validateApiKey = async (key = apiKey) => {
     if (!key) {
       setApiKeyValid(false);
@@ -152,8 +146,8 @@ const ViralClipsAI = () => {
     }
 
     try {
-      klapApi.setApiKey(key);
-      const validation = await klapApi.validateApiKey();
+      mockApi.setApiKey(key);
+      const validation = await mockApi.validateApiKey();
       
       if (validation.valid) {
         setApiKeyValid(true);
@@ -171,10 +165,9 @@ const ViralClipsAI = () => {
     }
   };
 
-  // Process video
   const processVideo = async (videoFile, options = {}) => {
     if (!apiKeyValid) {
-      showNotification('Please enter a valid Klap API key in settings', 'error');
+      showNotification('Please enter a valid API key in settings', 'error');
       setCurrentTab('settings');
       return;
     }
@@ -183,7 +176,6 @@ const ViralClipsAI = () => {
     setProcessingProgress(0);
 
     try {
-      // Simulate progress
       const progressInterval = setInterval(() => {
         setProcessingProgress(prev => {
           if (prev >= 90) {
@@ -194,7 +186,7 @@ const ViralClipsAI = () => {
         });
       }, 500);
 
-      const result = await klapApi.generateShorts(
+      const result = await mockApi.generateShorts(
         videoFile ? { file: videoFile } : { url: videoUrl },
         options
       );
@@ -205,7 +197,7 @@ const ViralClipsAI = () => {
       if (result.clips && result.clips.length > 0) {
         setGeneratedClips(result.clips);
         setCurrentTab('results');
-        showNotification(`Successfully generated ${result.clips.length} viral clips!`, 'success');
+        showNotification('Successfully generated ' + result.clips.length + ' viral clips!', 'success');
       } else {
         throw new Error('No clips were generated from your video');
       }
@@ -219,7 +211,6 @@ const ViralClipsAI = () => {
     }
   };
 
-  // Handle file upload
   const handleFileUpload = async (file) => {
     const validation = validateVideoFile(file);
     if (!validation.valid) {
@@ -238,10 +229,9 @@ const ViralClipsAI = () => {
       thumbnail: null
     });
     
-    showNotification(`Video uploaded: ${file.name}`, 'success');
+    showNotification('Video uploaded: ' + file.name, 'success');
   };
 
-  // Handle drag and drop
   const handleDragOver = (e) => {
     e.preventDefault();
     setDragOver(true);
@@ -262,7 +252,6 @@ const ViralClipsAI = () => {
     }
   };
 
-  // Handle URL submission
   const handleUrlSubmit = () => {
     if (!videoUrl) {
       showNotification('Please enter a video URL', 'error');
@@ -273,7 +262,6 @@ const ViralClipsAI = () => {
     processVideo(null, { url: videoUrl });
   };
 
-  // Save API key
   const saveApiKey = () => {
     if (!apiKey.trim()) {
       showNotification('Please enter a valid API key', 'error');
@@ -283,16 +271,13 @@ const ViralClipsAI = () => {
     validateApiKey(apiKey);
   };
 
-  // Download clip
   const downloadClip = (clip) => {
-    showNotification(`Downloading ${clip.title}...`, 'info');
-    // Simulate download
+    showNotification('Downloading ' + clip.title + '...', 'info');
     setTimeout(() => {
       showNotification('Download completed!', 'success');
     }, 1000);
   };
 
-  // Toggle dark mode
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
@@ -361,7 +346,7 @@ const ViralClipsAI = () => {
               {accountInfo && (
                 <div className={`text-right ${darkMode ? 'text-white' : 'text-gray-800'}`}>
                   <div className="font-semibold text-sm">
-                    {accountInfo.credits ? `${accountInfo.credits} credits` : 'Pro'}
+                    {accountInfo.credits ? accountInfo.credits + ' credits' : 'Pro'}
                   </div>
                   <div className="text-xs text-green-400 flex items-center">
                     <User className="w-3 h-3 mr-1" />
@@ -590,7 +575,7 @@ const ViralClipsAI = () => {
                     }`}>
                       <div 
                         className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${processingProgress}%` }}
+                        style={{ width: processingProgress + '%' }}
                       ></div>
                     </div>
                   </div>
@@ -611,7 +596,7 @@ const ViralClipsAI = () => {
               <h3 className={`text-2xl font-semibold mb-6 ${
                 darkMode ? 'text-white' : 'text-gray-800'
               }`}>
-                Klap API Configuration
+                API Configuration
               </h3>
               
               <div className="space-y-6">
@@ -619,13 +604,13 @@ const ViralClipsAI = () => {
                   <label className={`block font-medium mb-2 ${
                     darkMode ? 'text-white' : 'text-gray-800'
                   }`}>
-                    Klap API Key {apiKeyValid && <span className="text-green-500">✓</span>}
+                    API Key {apiKeyValid && <span className="text-green-500">✓</span>}
                   </label>
                   <input
                     type="password"
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="Enter your Klap API key"
+                    placeholder="Enter your API key"
                     className={`w-full px-4 py-3 rounded-lg transition-all ${
                       darkMode 
                         ? 'bg-black/30 border border-white/20 text-white placeholder-purple-200' 
@@ -635,15 +620,7 @@ const ViralClipsAI = () => {
                   <p className={`text-sm mt-2 ${
                     darkMode ? 'text-purple-200' : 'text-purple-600'
                   }`}>
-                    Get your API key from{' '}
-                    <a 
-                      href="https://klap.app" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-purple-400 hover:underline"
-                    >
-                      klap.app
-                    </a>
+                    Enter any text to demo the app functionality
                   </p>
                 </div>
                 
@@ -729,4 +706,24 @@ const ViralClipsAI = () => {
                         {clip.score}%
                       </div>
                       <div className="absolute bottom-4 left-4 bg-black/50 text-white px-2 py-1 rounded text-sm">
-                        <Clock className="w-3
+                        <Clock className="w-3 h-3 inline mr-1" />
+                        {formatDuration(clip.duration)}
+                      </div>
+                    </div>
+                    
+                    <div className="p-4">
+                      <h3 className={`font-semibold mb-2 ${
+                        darkMode ? 'text-white' : 'text-gray-800'
+                      }`}>
+                        {clip.title}
+                      </h3>
+                      
+                      {clip.transcript && (
+                        <p className={`text-sm mb-3 ${
+                          darkMode ? 'text-purple-200' : 'text-gray-600'
+                        }`}>
+                          {clip.transcript.substring(0, 100)}...
+                        </p>
+                      )}
+
+                      {clip.tags && clip.tags.length > 0 && (
