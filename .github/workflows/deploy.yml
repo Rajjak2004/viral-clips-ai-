@@ -20,13 +20,10 @@ jobs:
         node-version: '18'
         cache: 'npm'
         
-    - name: Clean npm cache
-      run: npm cache clean --force
-        
-    - name: Install dependencies
+    - name: Clean npm cache and install dependencies
       run: |
-        rm -rf node_modules package-lock.json
-        npm install --legacy-peer-deps
+        npm cache clean --force
+        npm ci --legacy-peer-deps || npm install --legacy-peer-deps
       
     - name: Build project
       run: npm run build
