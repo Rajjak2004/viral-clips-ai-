@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "https://Rajjak2004.github.io/viral-clips-ai-/static/css/main.fc33d182.css",
-    "main.js": "https://Rajjak2004.github.io/viral-clips-ai-/static/js/main.7941ae97.js",
+    "main.css": "https://Rajjak2004.github.io/viral-clips-ai-/static/css/main.138773d2.css",
+    "main.js": "https://Rajjak2004.github.io/viral-clips-ai-/static/js/main.705b12dc.js",
     "static/js/453.1effb9b5.chunk.js": "https://Rajjak2004.github.io/viral-clips-ai-/static/js/453.1effb9b5.chunk.js",
     "index.html": "https://Rajjak2004.github.io/viral-clips-ai-/index.html",
-    "main.fc33d182.css.map": "https://Rajjak2004.github.io/viral-clips-ai-/static/css/main.fc33d182.css.map",
-    "main.7941ae97.js.map": "https://Rajjak2004.github.io/viral-clips-ai-/static/js/main.7941ae97.js.map",
+    "main.138773d2.css.map": "https://Rajjak2004.github.io/viral-clips-ai-/static/css/main.138773d2.css.map",
+    "main.705b12dc.js.map": "https://Rajjak2004.github.io/viral-clips-ai-/static/js/main.705b12dc.js.map",
     "453.1effb9b5.chunk.js.map": "https://Rajjak2004.github.io/viral-clips-ai-/static/js/453.1effb9b5.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.fc33d182.css",
-    "static/js/main.7941ae97.js"
+    "static/css/main.138773d2.css",
+    "static/js/main.705b12dc.js"
   ]
 }
