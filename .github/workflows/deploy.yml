@@ -1,4 +1,4 @@
-name: Deploy ViralClips AI
+name: Deploy ViralClips AI (Custom Cache)
 
 on:
   push:
@@ -18,12 +18,24 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
         
-    - name: Clean npm cache and install dependencies
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}-legacy-peer-deps
+        restore-keys: |
+          ${{ runner.os }}-node-
+        
+    - name: Clean and install dependencies
       run: |
-        npm cache clean --force
-        npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+        if [ ! -d "node_modules" ]; then
+          npm cache clean --force
+          rm -rf package-lock.json
+          npm install --legacy-peer-deps
+        else
+          echo "Using cached node_modules"
+        fi
       
     - name: Build project
       run: npm run build
