@@ -1,4 +1,4 @@
-name: Deploy ViralClips AI (Production)
+name: Deploy ViralClips AI
 
 on:
   push:
@@ -18,9 +18,15 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+        cache: 'npm'
+        
+    - name: Clean npm cache
+      run: npm cache clean --force
         
     - name: Install dependencies
-      run: npm install
+      run: |
+        rm -rf node_modules package-lock.json
+        npm install --legacy-peer-deps
       
     - name: Build project
       run: npm run build
@@ -37,3 +43,9 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./build
         cname: viral.clips.ai
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-files
+        path: build/
