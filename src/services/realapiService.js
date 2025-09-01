@@ -1,15 +1,37 @@
-import OpenAI from 'openai';
+// Fix: Add proper error handling for OpenAI import
+let OpenAI;
+try {
+  OpenAI = require('openai').default || require('openai');
+} catch (error) {
+  console.warn('OpenAI package not available:', error.message);
+}
+
 import axios from 'axios';
 
 // Initialize OpenAI with proper error handling
 let openai = null;
 
-try {
-  if (process.env.REACT_APP_OPENAI_API_KEY) {
-    openai = new OpenAI({
-      apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+const initializeOpenAI = (apiKey) => {
+  if (!OpenAI) {
+    console.warn('OpenAI package not available');
+    return null;
+  }
+  
+  try {
+    return new OpenAI({
+      apiKey: apiKey,
       dangerouslyAllowBrowser: true
     });
+  } catch (error) {
+    console.warn('OpenAI initialization failed:', error);
+    return null;
+  }
+};
+
+// Try to initialize with env variable
+try {
+  if (process.env.REACT_APP_OPENAI_API_KEY && OpenAI) {
+    openai = initializeOpenAI(process.env.REACT_APP_OPENAI_API_KEY);
   }
 } catch (error) {
   console.warn('OpenAI initialization failed:', error);
@@ -20,25 +42,26 @@ const API_BASE = process.env.REACT_APP_BACKEND_URL || 'https://viral-clips-backe
 
 class RealApiService {
   constructor() {
-    this.apiKey = localStorage.getItem('openai_api_key') || '';
+    this.apiKey = '';
     this.isApiAvailable = !!openai;
+    
+    // Try to get API key from localStorage (browser only)
+    if (typeof window !== 'undefined' && window.localStorage) {
+      this.apiKey = localStorage.getItem('openai_api_key') || '';
+    }
   }
 
   // Set API key and reinitialize OpenAI
   setApiKey(key) {
     this.apiKey = key;
-    localStorage.setItem('openai_api_key', key);
     
-    try {
-      openai = new OpenAI({
-        apiKey: key,
-        dangerouslyAllowBrowser: true
-      });
-      this.isApiAvailable = true;
-    } catch (error) {
-      console.error('Failed to set API key:', error);
-      this.isApiAvailable = false;
+    // Store in localStorage (browser only)
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('openai_api_key', key);
     }
+    
+    openai = initializeOpenAI(key);
+    this.isApiAvailable = !!openai;
   }
 
   // Generate transcript using Whisper (with fallback)
@@ -66,8 +89,6 @@ class RealApiService {
       };
     } catch (error) {
       console.error('❌ Transcript error:', error);
-      
-      // Fallback to mock transcript
       return this.mockTranscript(videoFile);
     }
   }
@@ -189,61 +210,6 @@ Please analyze and return JSON with:
     };
   }
 
-  // Backend communication (if available)
-  async callBackend(endpoint, data) {
-    try {
-      const response = await axios.post(`${API_BASE}${endpoint}`, data, {
-        timeout: 30000,
-        headers: { 'Content-Type': 'application/json' }
-      });
-      return response.data;
-    } catch (error) {
-      console.warn(`Backend not available for ${endpoint}:`, error.message);
-      return null;
-    }
-  }
-
-  // Download from URL (with backend fallback)
-  async downloadFromUrl(url) {
-    const backendResult = await this.callBackend('/api/download-video', { url });
-    
-    if (backendResult) {
-      return backendResult;
-    }
-
-    // Frontend fallback - show instructions
-    return {
-      success: false,
-      error: 'Backend not available',
-      instruction: 'Please download the video manually and upload it using the file upload feature.',
-      mockData: {
-        title: 'Downloaded Video',
-        duration: 120,
-        thumbnail: 'https://via.placeholder.com/320x180/8b5cf6/ffffff?text=Video+Thumbnail'
-      }
-    };
-  }
-
-  // Process video (with backend fallback)
-  async processVideo(videoFile, options) {
-    const backendResult = await this.callBackend('/api/process-video', {
-      videoData: 'base64_encoded_video',
-      ...options
-    });
-
-    if (backendResult) {
-      return backendResult;
-    }
-
-    // Frontend fallback - generate mock processed video
-    return {
-      success: true,
-      processedVideoPath: URL.createObjectURL(videoFile),
-      message: 'Video processed (demo mode)',
-      settings: options
-    };
-  }
-
   // Generate viral clips with real AI
   async generateViralClips(videoFile, options = {}) {
     try {
@@ -269,7 +235,7 @@ Please analyze and return JSON with:
         duration: moment.endTime - moment.startTime,
         startTime: moment.startTime,
         endTime: moment.endTime,
-        url: URL.createObjectURL(videoFile), // In production, this would be processed video
+        url: URL.createObjectURL(videoFile),
         transcript: transcriptData.text.substring(
           Math.floor(moment.startTime * 5), 
           Math.floor(moment.endTime * 5)
@@ -294,7 +260,7 @@ Please analyze and return JSON with:
     }
   }
 
-  // Export functions (demo mode)
+  // Additional service methods...
   async exportToGoogleDrive(videoBlob, filename) {
     const url = URL.createObjectURL(videoBlob);
     const link = document.createElement('a');
