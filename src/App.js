@@ -591,4 +591,150 @@ function App() {
               <button 
                 onClick={processUrl}
                 disabled={isProcessing || !videoUrl.trim()}
-                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500
+                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-2xl font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all disabled:opacity-50 hover:scale-105"
+              >
+                <Download size={24} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Video Preview */}
+        {videoPreview && (
+          <div className={`${
+            darkMode ? 'bg-white/5 border-white/20' : 'bg-white/50 border-gray-200'
+          } backdrop-blur-xl rounded-2xl border p-6 shadow-lg`}>
+            <div className="flex items-center gap-3 mb-6">
+              <Play className="text-blue-400" size={24} />
+              <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                Video Preview
+              </h2>
+            </div>
+            <div className="aspect-video bg-black rounded-2xl overflow-hidden shadow-xl">
+              <video 
+                src={videoPreview}
+                controls
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Viral Clips Results */}
+        {clips.length > 0 && (
+          <div className={`${
+            darkMode ? 'bg-white/5 border-white/20' : 'bg-white/50 border-gray-200'
+          } backdrop-blur-xl rounded-2xl border p-8 shadow-lg`}>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Sparkles className="text-yellow-400" size={28} />
+                <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                  Generated Viral Clips
+                </h2>
+              </div>
+              <div className="text-right">
+                <div className={`text-2xl font-bold ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
+                  {clips.length} Clips
+                </div>
+                <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Ready to viral
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {clips.map((clip) => (
+                <div key={clip.id} className={`group relative overflow-hidden rounded-2xl border-2 transition-all hover:scale-105 hover:shadow-2xl ${
+                  darkMode 
+                    ? 'bg-gray-800/50 border-gray-700 hover:border-purple-400' 
+                    : 'bg-white/80 border-gray-200 hover:border-purple-400'
+                }`}>
+                  {/* Thumbnail */}
+                  <div className="aspect-video bg-gradient-to-br from-purple-500 to-pink-500 relative overflow-hidden">
+                    <img 
+                      src={clip.thumbnail} 
+                      alt={clip.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all"></div>
+                    
+                    {/* Play Button */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                      <div className="w-16 h-16 bg-white/20 backdrop-blur-lg rounded-full flex items-center justify-center">
+                        <Play className="text-white ml-1" size={24} />
+                      </div>
+                    </div>
+                    
+                    {/* Score Badge */}
+                    <div className="absolute top-4 right-4">
+                      <div className={`px-3 py-1 rounded-full text-sm font-bold ${
+                        clip.score >= 90 
+                          ? 'bg-green-500 text-white' 
+                          : clip.score >= 80 
+                            ? 'bg-yellow-500 text-black'
+                            : 'bg-orange-500 text-white'
+                      }`}>
+                        {clip.score}%
+                      </div>
+                    </div>
+                    
+                    {/* Platform Badge */}
+                    <div className="absolute top-4 left-4">
+                      <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        darkMode ? 'bg-white/20 text-white' : 'bg-black/20 text-white'
+                      }`}>
+                        {presets[clip.platform]?.icon} {presets[clip.platform]?.name}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="p-6">
+                    <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                      {clip.title}
+                    </h3>
+                    
+                    <p className={`text-sm mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {clip.transcript}
+                    </p>
+                    
+                    {/* Stats */}
+                    <div className="flex items-center gap-4 mb-4 text-sm">
+                      <div className="flex items-center gap-1">
+                        <Clock size={16} className="text-blue-400" />
+                        <span>{clip.duration}s</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Target size={16} className="text-green-400" />
+                        <span>{clip.score}% viral</span>
+                      </div>
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => downloadClip(clip)}
+                        className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center justify-center gap-2"
+                      >
+                        <Download size={16} />
+                        Download
+                      </button>
+                      
+                      <button 
+                        onClick={() => shareClip(clip)}
+                        className={`px-4 py-2 border rounded-xl font-semibold transition-all hover:scale-105 ${
+                          darkMode 
+                            ? 'border-white/20 text-white hover:bg-white/10' 
+                            : 'border-gray-300 text-gray-700 hover:bg-gray-100'
+                        }`}
+                      >
+                        <Share2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Bulk Actions */}
+            <div className
