@@ -1,4 +1,4 @@
-name: Deploy ViralClips AI (Custom Cache)
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -11,50 +11,28 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v3
       with:
         node-version: '18'
-        
-    - name: Cache node_modules
-      uses: actions/cache@v4
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}-legacy-peer-deps
-        restore-keys: |
-          ${{ runner.os }}-node-
-        
-    - name: Clean and install dependencies
-      run: |
-        if [ ! -d "node_modules" ]; then
-          npm cache clean --force
-          rm -rf package-lock.json
-          npm install --legacy-peer-deps
-        else
-          echo "Using cached node_modules"
-        fi
-      
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
     - name: Build project
       run: npm run build
       env:
         CI: false
-        REACT_APP_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        REACT_APP_BACKEND_URL: ${{ secrets.BACKEND_URL }}
-        PUBLIC_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
-        
+        GENERATE_SOURCEMAP: false
+    
     - name: Deploy to GitHub Pages
       if: github.ref == 'refs/heads/main'
-      uses: peaceiris/actions-gh-pages@v4
+      uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./build
-        cname: viral.clips.ai
-        
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-files
-        path: build/
+        cname: # Add your custom domain here if you have one
